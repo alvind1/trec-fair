@@ -70,6 +70,7 @@ if __name__ == '__main__':
                         help='output file')
     parser.add_argument('--stride', type=int, default=5, help='')
     parser.add_argument('--max_length', type=int, default=10, help='')
+    parser.add_argument('--only-first-segment', action='store_true')
 
     args = parser.parse_args()
 
@@ -156,6 +157,8 @@ if __name__ == '__main__':
                             f'Query: {query} Keywords: {keywords} Document: {segment} Relevant:{relevant}\n')
                     n_segments += 1
                     if i + args.max_length >= len(sentences):
+                        break
+                    if args.only_first_segment:
                         break
 
     print(f'{n_no_content} examples with only title')
