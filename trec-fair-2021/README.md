@@ -50,7 +50,7 @@ python -m pyserini.search.lucene \
   --hits 1000
 ```
 
-To negative sample from runs, we need 100,000 hits
+To perform negative sampling using runs, we need 100,000 hits
 ```bash
 python -m pyserini.search.lucene \
   --index indexes/trec-fair-2021-text \
@@ -142,7 +142,7 @@ ndcg                  	all	0.5545
 ndcg_cut_10           	all	0.7932
 ```
 
-# T5
+# Preparing input for T5
 
 ## Train
 
@@ -152,8 +152,8 @@ python create_trec_fair_2021_monot5_input.py \
   --corpus collections/Text/trecfair2021.text.jsonl \
   --topics topics-and-qrels/trecfair2021.train.queries.tsv \
   --qrel topics-and-qrels/trecfair2021.train.qrels_w_run_negative_samples.txt \
-  --output_t5_texts t5_inputs/trecfair2021.t5input.text_corpus.bm25.qrels_w_run_negative_samples.txt \
-  --output_t5_ids t5_inputs/trecfair2021.t5input.text_corpus.bm25.qrels_w_run_negative_samples.ids.txt \
+  --output_t5_texts t5_inputs/trecfair2021.train.t5input.text_corpus.bm25.qrels_w_run_negative_samples.txt \
+  --output_t5_ids t5_inputs/trecfair2021.train.t5input.text_corpus.bm25.qrels_w_run_negative_samples.ids.txt \
   --stride 4 \
   --max_length 8
 ```
@@ -164,8 +164,8 @@ python create_trec_fair_2021_monot5_input.py \
   --corpus collections/Text/trecfair2021.text.jsonl \
   --topics topics-and-qrels/trecfair2021.train.queries.tsv \
   --qrel topics-and-qrels/trecfair2021.train.qrels_w_run_negative_samples.txt \
-  --output_t5_texts t5_inputs/trecfair2021.t5input.text_corpus.bm25.qrels_w_run_negative_samples.first_segment.txt \
-  --output_t5_ids t5_inputs/trecfair2021.t5input.text_corpus.bm25.qrels_w_run_negative_samples.first_segment.ids.txt \
+  --output_t5_texts t5_inputs/trecfair2021.train.t5input.text_corpus.bm25.qrels_w_run_negative_samples.first_segment.txt \
+  --output_t5_ids t5_inputs/trecfair2021.train.t5input.text_corpus.bm25.qrels_w_run_negative_samples.first_segment.ids.txt \
   --stride 4 \
   --max_length 8 \
   --only-first-segment
@@ -177,8 +177,8 @@ python create_trec_fair_2021_monot5_input.py \
   --corpus collections/Text/trecfair2021.text.jsonl \
   --topics topics-and-qrels/trecfair2021.train.queries.tsv \
   --qrel topics-and-qrels/trecfair2021.train.qrels_w_random_negative_samples.txt \
-  --output_t5_texts t5_inputs/trecfair2021.t5input.text_corpus.bm25.qrels_w_random_negative_samples.txt \
-  --output_t5_ids t5_inputs/trecfair2021.t5input.text_corpus.bm25.qrels_w_random_negative_samples.ids.txt \
+  --output_t5_texts t5_inputs/trecfair2021.train.t5input.text_corpus.bm25.qrels_w_random_negative_samples.txt \
+  --output_t5_ids t5_inputs/trecfair2021.train.t5input.text_corpus.bm25.qrels_w_random_negative_samples.ids.txt \
   --stride 4 \
   --max_length 8
 ```
@@ -191,8 +191,43 @@ python create_trec_fair_2021_monot5_input.py \
   --corpus collections/Text/trecfair2021.text.json \
   --topics topics-and-qrels/raw/trecfair2021.eval.queries.tsv \
   --run runs/trecfair2021.eval.run1000.text_corpus.bm25.txt \
-  --output_t5_texts t5_inputs/trecfair2021.t5input.text_corpus.bm25.txt \
-  --output_t5_ids t5_inputs/trecfair2021.t5input.text_corpus.bm25.ids.txt \
+  --output_t5_texts t5_inputs/trecfair2021.eval.t5input.text_corpus.bm25.txt \
+  --output_t5_ids t5_inputs/trecfair2021.eval.t5input.text_corpus.bm25.ids.txt \
   --stride 4 \
   --max_length 8
+```
+
+# Evaluating runs
+
+We will be using [trec fair 2021 evaluator](https://github.com/fair-trec/trec2021-fair-public) to judge our runs.  
+It expects runs to be of the form `query_id\tdoc_id`
+
+We can convert Anserini runs of the form `query_id Q0 doc_id _ _ Anserini` to `query_id\tdoc_id`
+```bash
+python convert_anserini_runs_for_official_eval.py \
+  --input runs/trecfair2021.eval.run1000.text_corpus.bm25.txt \
+  --output runs/ \
+  --task 1
+```
+
+Then, we can get the official evaluation stored in results/
+```bash
+conda activate wptrec
+bash trec_fair_2021_run_eval.sh ../../trec2021-fair-public/ runs/trecfair2021.eval.run1000.text_corpus.bm25.eval_format.txt
+```
+
+To analyze the results
+```bash
+python analyze_results.py \
+  --files results/trecfair2021.eval.run1000.text_corpus.bm25.eval_format.txt.tsv \
+  --output-file results/task1_summary.tsv \
+  --task 1
+```
+
+The output should be 
+```bash
+Filename:  trecfair2021
+Mean nDCG:  0.1897162787844332
+Mean AWRF:  0.6394697380199352
+Mean Score:  0.12017384821260774
 ```
