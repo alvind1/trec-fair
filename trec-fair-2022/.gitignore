@@ -1,9 +1,8 @@
 *.out
 trec_eval
+temp*
 collections/*
-results/*
 indexes/*
 runs/*
-t5_inputs/*
 topics-and-qrels/*
-temp*
+t5_inputs/*

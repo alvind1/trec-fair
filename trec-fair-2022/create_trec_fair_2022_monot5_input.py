@@ -1,8 +1,8 @@
 import argparse
+import json
 import logging
 import re
 import spacy
-import json
 
 from tqdm import tqdm
 
@@ -56,7 +56,7 @@ def load_qrels(path):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-        description='Create T5 input for Fair Trec 2021 queries.')
+        description='Create T5 input for Fair Trec 2022 queries.')
     parser.add_argument('--topics', required=True,
                         help='Topics file (queries)')
     parser.add_argument('--run', required=False, default='',
@@ -109,7 +109,7 @@ if __name__ == '__main__':
                 contents = corpus[doc_id]
                 n_docs += 1
                 passage_text = contents['contents']
-                doc_title = contents['raw']['title']
+                doc_title = contents['title']
 
                 # Remove any duplicated spaces or line breaks.
                 passage_text = ' '.join(passage_text.split())

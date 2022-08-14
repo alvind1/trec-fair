@@ -12,6 +12,7 @@ File naming format:
 # Get data
 
 ```bash
+mkdir collections/raw
 wget https://data.boisestate.edu/library/Ekstrand-2021/TRECFairRanking2021/trec_topics.json.gz -O topics-and-qrels/raw/trecfair2021.train.topics.json.gz
 wget https://data.boisestate.edu/library/Ekstrand-2021/TRECFairRanking2021/eval-topics.json.gz -O tools/topics-and-qrels/raw/trecfair2021.eval.topics.json.gz
 wget https://trec.nist.gov/data/fair/2021-eval-topics-with-qrels.json.gz -O topics-and-qrels/raw/trecfair2021.eval.reldocs.json.gz
@@ -76,7 +77,7 @@ python -m pyserini.search.lucene \
 To perform negative sampling, we need to get the docIDs
 ```bash
 python get_trec_fair_2021_doc_ids.py \
-  --input collections/Text/trecfair2021.text.jsonl \
+  --input collections/text/trecfair2021.text.jsonl \
   --output topics-and-qrels/trecfair2021.docids.txt
 ```
 
@@ -149,7 +150,7 @@ ndcg_cut_10           	all	0.7932
 Creating T5 input from qrels with run negative samples
 ```bash
 python create_trec_fair_2021_monot5_input.py \
-  --corpus collections/Text/trecfair2021.text.jsonl \
+  --corpus collections/text/trecfair2021.text.jsonl \
   --topics topics-and-qrels/trecfair2021.train.queries.tsv \
   --qrel topics-and-qrels/trecfair2021.train.qrels_w_run_negative_samples.txt \
   --output_t5_texts t5_inputs/trecfair2021.train.t5input.text_corpus.bm25.qrels_w_run_negative_samples.txt \
@@ -161,7 +162,7 @@ python create_trec_fair_2021_monot5_input.py \
 Create T5 input with only the first segment
 ```bash
 python create_trec_fair_2021_monot5_input.py \
-  --corpus collections/Text/trecfair2021.text.jsonl \
+  --corpus collections/text/trecfair2021.text.jsonl \
   --topics topics-and-qrels/trecfair2021.train.queries.tsv \
   --qrel topics-and-qrels/trecfair2021.train.qrels_w_run_negative_samples.txt \
   --output_t5_texts t5_inputs/trecfair2021.train.t5input.text_corpus.bm25.qrels_w_run_negative_samples.first_segment.txt \
@@ -174,7 +175,7 @@ python create_trec_fair_2021_monot5_input.py \
 Create T5 input from qrels with random negative samples
 ```bash
 python create_trec_fair_2021_monot5_input.py \
-  --corpus collections/Text/trecfair2021.text.jsonl \
+  --corpus collections/text/trecfair2021.text.jsonl \
   --topics topics-and-qrels/trecfair2021.train.queries.tsv \
   --qrel topics-and-qrels/trecfair2021.train.qrels_w_random_negative_samples.txt \
   --output_t5_texts t5_inputs/trecfair2021.train.t5input.text_corpus.bm25.qrels_w_random_negative_samples.txt \
@@ -188,8 +189,8 @@ python create_trec_fair_2021_monot5_input.py \
 Create T5 input from BM25 run
 ```bash
 python create_trec_fair_2021_monot5_input.py \
-  --corpus collections/Text/trecfair2021.text.json \
-  --topics topics-and-qrels/raw/trecfair2021.eval.queries.tsv \
+  --corpus collections/text/trecfair2021.text.json \
+  --topics topics-and-qrels/trecfair2021.eval.queries.tsv \
   --run runs/trecfair2021.eval.run1000.text_corpus.bm25.txt \
   --output_t5_texts t5_inputs/trecfair2021.eval.t5input.text_corpus.bm25.txt \
   --output_t5_ids t5_inputs/trecfair2021.eval.t5input.text_corpus.bm25.ids.txt \
