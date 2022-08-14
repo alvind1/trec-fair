@@ -3,11 +3,11 @@ import json
 import logging
 import re
 import spacy
-
 from tqdm import tqdm
 
 
 def load_corpus(path):
+    logging.info('loading corpus...')
     corpus = {}
     with open(path, 'r') as fcorpus:
         for line in tqdm(fcorpus):
@@ -28,6 +28,7 @@ def load_queries(path):
 
 
 def load_run(path):
+    logging.info('loading runs...')
     run = {}
     with open(path, 'r') as frun:
         for line in tqdm(frun):
@@ -40,9 +41,10 @@ def load_run(path):
     return run
 
 def load_qrels(path):
+    logging.info('loading qrels...')
     run = {}
-    with open(path, 'r') as frun:
-        for line in tqdm(frun):
+    with open(path, 'r') as fqrels:
+        for line in tqdm(fqrels):
             query_id, _, doc_id, rel = line.split()
             query_id = int(query_id)
             doc_id = int(doc_id)
@@ -67,18 +69,22 @@ if __name__ == '__main__':
     parser.add_argument('--output_t5_texts', required=True, default='',
                         help='output file')
     parser.add_argument('--output_t5_ids', required=True, default='',
-                        help='output file')
+                        help='output id file')
     parser.add_argument('--stride', type=int, default=5, help='')
     parser.add_argument('--max_length', type=int, default=10, help='')
     parser.add_argument('--only-first-segment', action='store_true')
-
+    parser.add_argument('-v', '--verbose', action='store_true', help='verbose')
     args = parser.parse_args()
 
     if args.run == '' and args.qrel == '':
         parser.error("at least one of --run, --qrel is required")
         quit()
 
-    logging.info(args)
+    if args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+    logging.info('starting...')
 
     queries = load_queries(args.topics)
     run = {}
@@ -89,6 +95,7 @@ if __name__ == '__main__':
     assert len(run) > 0
     corpus = load_corpus(args.corpus)
 
+    logging.info('creating t5 inputs...')
     nlp = spacy.blank("en")
     nlp.add_pipe("sentencizer")
     n_docs = 0
@@ -161,8 +168,8 @@ if __name__ == '__main__':
                     if args.only_first_segment:
                         break
 
-    print(f'{n_no_content} examples with only title')
-    print(f'{n_not_found} examples not found')
-    print(f'Wrote {n_segments} segments from {n_docs} docs.')
-    print(f'There were {n_no_segments} docs without segments/sentences.')
-    print('Done')
+    logging.info(f'{n_no_content} examples with only title')
+    logging.info(f'{n_not_found} examples not found')
+    logging.info(f'Wrote {n_segments} segments from {n_docs} docs.')
+    logging.info(f'There were {n_no_segments} docs without segments/sentences.')
+    logging.info('Done')

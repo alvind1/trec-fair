@@ -52,6 +52,28 @@ wget https://data.boisestate.edu/library/Ekstrand/TRECFairRanking/2022/trec_2022
 wget https://data.boisestate.edu/library/Ekstrand/TRECFairRanking/2022/trec_2022_train_reldocs.jsonl -O topics-and-qrels/raw/trecfair2022.train_reldocs.jsonl
 ```
 
+# Index
+
+```bash
+python -m pyserini.index.lucene \
+  --collection JsonCollection \
+  --input collections/plain-ignore-duplicates \
+  --index indexes/plain-ignore-duplicates \
+  --generator DefaultLuceneDocumentGenerator \
+  --threads 9 \
+  --storePositions --storeDocvectors --storeRaw
+```
+
+```bash
+python -m pyserini.index.lucene \
+  --collection JsonCollection \
+  --input collections/plain-merge-duplicates \
+  --index indexes/plain-merge-duplicates \
+  --generator DefaultLuceneDocumentGenerator \
+  --threads 9 \
+  --storePositions --storeDocvectors --storeRaw
+```
+
 # Prepare topics
 
 ## Train
@@ -78,9 +100,9 @@ python convert_trec_fair_2022_queries_to_tsv.py \
 Normal run only needs 500 hits
 ```bash
 python -m pyserini.search.lucene \
-  --index indexes/trec-fair-2022-plain\
+  --index indexes/trec-fair-2022-plain-ignore-duplicates\
   --topics topics-and-qrels/trecfair2022.train.queries.tsv \
-  --output runs/trecfair2022.train.run500.plain_corpus.bm25.txt \
+  --output runs/trecfair2022.train.run500.plain_corpus_ignore_duplicates.bm25.txt \
   --bm25 \
   --hits 500
 ```
@@ -88,9 +110,9 @@ python -m pyserini.search.lucene \
 To perform negative sampling using runs, we need 100,000 hits
 ```bash
 python -m pyserini.search.lucene \
-  --index indexes/trec-fair-2022-plain\
+  --index indexes/trec-fair-2022-plain-ignore-duplicates\
   --topics topics-and-qrels/trecfair2022.train.queries.tsv \
-  --output runs/trecfair2022.train.run100000.plain_corpus.bm25.txt \
+  --output runs/trecfair2022.train.run100000.plain_corpus_ignore_duplicates.bm25.txt \
   --bm25 \
   --hits 100000
 ```
@@ -141,7 +163,7 @@ python convert_trec_fair_2022_reldocs_to_qrels.py \
   --output topics-and-qrels/trecfair2022.train.qrels_w_run_negative_samples.txt \
   --run-negative-samples \
   --docIDs topics-and-qrels/trecfair2022.docids.txt \
-  --run runs/trecfair2021.train.run100000.text_corpus.bm25.txt
+  --run runs/trecfair2022.train.run100000.plain_corpus_ignore_duplicates.bm25.txt
 ```
 
 Quick check with trec_eval tool   
@@ -165,16 +187,40 @@ qrels for TREC Fair 2022 eval has not come out yet.
 # Preparing input for T5
 
 ## Train
-
-Creating T5 input from qrels with random negative samples
+Creating T5 input from qrels with run negative samples
 
 ```bash
 python create_trec_fair_2022_monot5_input.py \
-  --corpus collections/plain/trecfair2022.plain.jsonl \
+  --corpus collections/plain-ignore-duplicates/trecfair2022.plain_ignore_duplicates.jsonl \
+  --topics topics-and-qrels/trecfair2022.train.queries.tsv \
+  --qrel topics-and-qrels/trecfair2022.train.qrels_w_run_negative_samples.txt \
+  --output_t5_texts t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.bm25.qrels_w_run_negative_samples.txt \
+  --output_t5_ids t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.bm25.qrels_w_run_negative_samples.ids.txt \
+  --stride 4 \
+  --max_length 8
+```
+
+Create T5 input with only the first segment and run negative samples
+```bash
+python create_trec_fair_2022_monot5_input.py \
+  --corpus collections/plain-ignore-duplicates/trecfair2022.plain_ignore_duplicates.jsonl \
+  --topics topics-and-qrels/trecfair2022.train.queries.tsv \
+  --qrel topics-and-qrels/trecfair2022.train.qrels_w_run_negative_samples.txt \
+  --output_t5_texts t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.bm25.qrels_w_run_negative_samples.first_segment.txt \
+  --output_t5_ids t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.bm25.qrels_w_run_negative_samples.first_segment.ids.txt \
+  --stride 4 \
+  --max_length 8 \
+  --only-first-segment
+```
+
+Creating T5 input from qrels with random negative samples
+```bash
+python create_trec_fair_2022_monot5_input.py \
+  --corpus collections/plain-ignore-duplicates/trecfair2022.plain_ignore_duplicates.jsonl \
   --topics topics-and-qrels/trecfair2022.train.queries.tsv \
   --qrel topics-and-qrels/trecfair2022.train.qrels_w_random_negative_samples.txt \
-  --output_t5_texts t5_inputs/trecfair2022.train.t5input.text_corpus.bm25.qrels_w_random_negative_samples.txt \
-  --output_t5_ids t5_inputs/trecfair2022.train.t5input.text_corpus.bm25.qrels_w_random_negative_samples.ids.txt \
+  --output_t5_texts t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.bm25.qrels_w_random_negative_samples.txt \
+  --output_t5_ids t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.bm25.qrels_w_random_negative_samples.ids.txt \
   --stride 4 \
   --max_length 8
 ```

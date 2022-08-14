@@ -1,7 +1,10 @@
 import argparse
 import json
+import logging
 import numpy as np
 from tqdm import tqdm
+
+import config
 
 # from https://tech.hbc.com/2018-03-23-negative-sampling-in-numpy.html
 def negsamp_vectorized_bsearch(pos_inds, n_items, n_samp):
@@ -40,7 +43,7 @@ def load_doc_ids(path):
     with open(path, 'r') as f:
         docIDs = json.loads(f.readline())
         assert type(docIDs) == list
-        assert len(docIDs) == trec_2021_fair_num_docs
+        assert len(docIDs) == config.NUM_DOCUMENTS
     return docIDs
 
 def get_pos_inds_from_docs(doc_ids, rel_docs):
@@ -54,7 +57,7 @@ def get_pos_inds_from_run(run_docs, rel_docs):
     b_temp = np.searchsorted(run_docs, rel_docs, 'right')
     return a_temp[a_temp != b_temp]
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description='Converts trec fair 2021 reldocs to qrels')
 parser.add_argument('--input', type=str, required=True, help='input file containing the rel docs of trec fair 2022 documents')
 parser.add_argument('--output', type=str, required=True, help='output file containg the rel docs in qrels format')
 parser.add_argument('--run', type=str, default="", required=False, help='path to BM25 run file from which to sample negative examples')
@@ -63,8 +66,7 @@ parser.add_argument('--random-negative-samples', action='store_true', default=Fa
 parser.add_argument('--run-negative-samples', action='store_true', default=False, help='add sampled negative examples from run')
 args = parser.parse_args()
 
-trec_2021_fair_num_docs = 6280328
-#max_positives = 564158
+logging.basicConfig(level=logging.INFO)
 
 run = []
 doc_ids = []
@@ -90,7 +92,7 @@ with open(args.input, 'r') as f, open(args.output, 'w') as outf:
 
         if args.random_negative_samples:
             pos_inds = get_pos_inds_from_docs(doc_ids, list(rel_docs))
-            neg_inds = negsamp_vectorized_bsearch(pos_inds, trec_2021_fair_num_docs, len(rel_docs))
+            neg_inds = negsamp_vectorized_bsearch(pos_inds, config.NUM_DOCUMENTS, len(rel_docs))
             assert len(neg_inds) == len(rel_docs)
             neg_elements = [doc_ids[i] for i in neg_inds]
             for doc_id in neg_elements:

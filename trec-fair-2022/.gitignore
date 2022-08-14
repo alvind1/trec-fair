@@ -6,3 +6,4 @@ indexes/*
 runs/*
 topics-and-qrels/*
 t5_inputs/*
+__pycache__
