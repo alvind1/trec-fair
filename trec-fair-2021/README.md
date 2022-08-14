@@ -3,6 +3,22 @@
 This is a folder that holds scripts for preprocessing data used for TREC Fair 2021.  
 In 2021, the corpus had 6280328 articles.
 
+The fairness attributes are
+- geographical location
+  - Africa
+  - Antarctica
+  - Asia
+  - Europe
+  - Latin America and the Caribbean
+  - Northern America
+  - Oceania
+
+Task 1 expects, per query, 1 ranking with 1000 articles each.  
+The output format is `{query_id}\t{doc_id}`.
+
+Task 2 expects, per query, 100 rankings with 50 articles each.  
+The output format is `{query_id}\t{repeat_number}\t{doc_id}`.
+
 # Repo Organization
 Script naming format: snake case
 
@@ -232,3 +248,64 @@ Mean nDCG:  0.1897162787844332
 Mean AWRF:  0.6394697380199352
 Mean Score:  0.12017384821260774
 ```
+
+# Reranking for fairness
+
+```bash
+python rerank_trec_fair_2021_docs.py \
+  --corpus collections/Text/trecfair2021.text.jsonl \
+  --run runs/trecfair2021.eval.run1000.text_corpus.bm25.eval_format.txt \
+  --output runs/trecfair2021.eval.run1000.text_corpus.bm25.reranked_opt1.eval_format.txt \
+  --option 1
+
+python rerank_trec_fair_2021_docs.py \
+  --corpus collections/Text/trecfair2021.text.jsonl \
+  --run runs/trecfair2021.eval.run1000.text_corpus.bm25.eval_format.txt \
+  --output runs/trecfair2021.eval.run1000.text_corpus.bm25.reranked_opt2.eval_format.txt \
+  --option 2
+
+python rerank_trec_fair_2021_docs.py \
+  --corpus collections/Text/trecfair2021.text.jsonl \
+  --run runs/trecfair2021.eval.run1000.text_corpus.bm25.eval_format.txt \
+  --output runs/trecfair2021.eval.run1000.text_corpus.bm25.reranked_opt3.eval_format.txt \
+  --option 3
+```
+
+Then, we can evaluate these reranked runs/
+
+```bash
+conda activate wptrec
+
+bash trec_fair_2021_run_eval.sh ../../trec2021-fair-public/ runs/trecfair2021.eval.run1000.text_corpus.bm25.reranked_opt1.eval_format.txt
+
+python analyze_results.py \
+  --files results/trecfair2021.eval.run1000.text_corpus.bm25.reranked_opt1.eval_format.txt.tsv \
+  --output-file results/task1_summary.tsv \
+  --task 1
+```
+The mean AWRF score should be around `0.7` +/- `0.03`.
+
+```bash
+conda activate wptrec
+
+bash trec_fair_2021_run_eval.sh ../../trec2021-fair-public/ runs/trecfair2021.eval.run1000.text_corpus.bm25.reranked_opt2.eval_format.txt
+
+python analyze_results.py \
+  --files results/trecfair2021.eval.run1000.text_corpus.bm25.reranked_opt2.eval_format.txt.tsv \
+  --output-file results/task1_summary.tsv \
+  --task 1
+```
+The mean AWRF score should be around `0.7` +/- `0.03`.
+
+```bash
+conda activate wptrec
+
+bash trec_fair_2021_run_eval.sh ../../trec2021-fair-public/ runs/trecfair2021.eval.run1000.text_corpus.bm25.reranked_opt3.eval_format.txt
+
+python analyze_results.py \
+  --files results/trecfair2021.eval.run1000.text_corpus.bm25.reranked_opt3.eval_format.txt.tsv \
+  --output-file results/task1_summary.tsv \
+  --task 1
+```
+
+The mean AWRF score should be around `0.7` +/- `0.03` and the mean Score should be around `0.12` +/- `0.02`.
