@@ -308,4 +308,4 @@ python analyze_results.py \
   --task 1
 ```
 
-The mean AWRF score should be around `0.7` +/- `0.03` and the mean Score should be around `0.12` +/- `0.02`.
+The mean AWRF score should be around `0.7` +/- `0.03` and the mean score should be around `0.12` +/- `0.02`.

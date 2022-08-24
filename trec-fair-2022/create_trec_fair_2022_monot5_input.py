@@ -98,6 +98,7 @@ if __name__ == '__main__':
     logging.info('creating t5 inputs...')
     nlp = spacy.blank("en")
     nlp.add_pipe("sentencizer")
+    nlp.max_length = 1500000
     n_docs = 0
     n_segments = 0
     n_no_segments = 0

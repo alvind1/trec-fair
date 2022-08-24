@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 import config
 
-# from https://tech.hbc.com/2018-03-23-negative-sampling-in-numpy.html
+# modified from https://tech.hbc.com/2018-03-23-negative-sampling-in-numpy.html
 def negsamp_vectorized_bsearch(pos_inds, n_items, n_samp):
     """ Pre-verified with binary search
     `pos_inds` is assumed to be ordered
@@ -64,21 +64,30 @@ parser.add_argument('--run', type=str, default="", required=False, help='path to
 parser.add_argument('--docIDs', type=str, default="", required=False, help='path to docIDs file, used to generate negative examples')
 parser.add_argument('--random-negative-samples', action='store_true', default=False, help='add randomly sampled negative examples from the corpus')
 parser.add_argument('--run-negative-samples', action='store_true', default=False, help='add sampled negative examples from run')
+parser.add_argument('--verbose', action='store_true')
 args = parser.parse_args()
 
-logging.basicConfig(level=logging.INFO)
+if args.verbose:
+    logging.basicConfig(level=logging.DEBUG)
+else:
+    logging.basicConfig(level=logging.INFO)
 
 run = []
 doc_ids = []
-if args.random_negative_samples:
+if args.random_negative_samples and args.run_negative_samples:
+    raise Exception('only one of the arguments random-negative-samples, run-negative-samples may be set')
+elif args.random_negative_samples:
     assert args.docIDs != ""
     doc_ids = load_doc_ids(args.docIDs)
-
-if args.run_negative_samples:
+    logging.debug('creating qrels with random negative samples')
+elif args.run_negative_samples:
     assert args.run != ""
     runs = load_runs(args.run)
     assert args.docIDs != ""
     doc_ids = load_doc_ids(args.docIDs)
+    logging.debug('creating qrles with random negative samples')
+else:
+    logging.debug('creating qrles')
 
 with open(args.input, 'r') as f, open(args.output, 'w') as outf:
     for line in tqdm(f):
@@ -99,7 +108,7 @@ with open(args.input, 'r') as f, open(args.output, 'w') as outf:
                 output = str(query['id']) + " 0 " + str(doc_id) + " 0"
                 outf.write(output + '\n')
                 assert doc_id not in rel_docs
-            #print(f"{query['id']} {len(rel_docs)} {len(pos_inds)} {len(neg_elements)}") 
+            logging.debug(f"{query['id']} {len(rel_docs)} {len(pos_inds)} {len(neg_elements)}")
         elif args.run_negative_samples:
             pos_inds = get_pos_inds_from_run(runs[query['id']], list(rel_docs))
             run_length = len(runs[query['id']])

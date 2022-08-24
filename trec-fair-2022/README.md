@@ -194,8 +194,8 @@ python create_trec_fair_2022_monot5_input.py \
   --corpus collections/plain-ignore-duplicates/trecfair2022.plain_ignore_duplicates.jsonl \
   --topics topics-and-qrels/trecfair2022.train.queries.tsv \
   --qrel topics-and-qrels/trecfair2022.train.qrels_w_run_negative_samples.txt \
-  --output_t5_texts t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.bm25.qrels_w_run_negative_samples.txt \
-  --output_t5_ids t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.bm25.qrels_w_run_negative_samples.ids.txt \
+  --output_t5_texts t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.qrels_w_run_negative_samples.txt \
+  --output_t5_ids t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.qrels_w_run_negative_samples.ids.txt \
   --stride 4 \
   --max_length 8
 ```
@@ -206,8 +206,8 @@ python create_trec_fair_2022_monot5_input.py \
   --corpus collections/plain-ignore-duplicates/trecfair2022.plain_ignore_duplicates.jsonl \
   --topics topics-and-qrels/trecfair2022.train.queries.tsv \
   --qrel topics-and-qrels/trecfair2022.train.qrels_w_run_negative_samples.txt \
-  --output_t5_texts t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.bm25.qrels_w_run_negative_samples.first_segment.txt \
-  --output_t5_ids t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.bm25.qrels_w_run_negative_samples.first_segment.ids.txt \
+  --output_t5_texts t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.qrels_w_run_negative_samples.first_segment.txt \
+  --output_t5_ids t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.qrels_w_run_negative_samples.first_segment.ids.txt \
   --stride 4 \
   --max_length 8 \
   --only-first-segment
@@ -219,8 +219,8 @@ python create_trec_fair_2022_monot5_input.py \
   --corpus collections/plain-ignore-duplicates/trecfair2022.plain_ignore_duplicates.jsonl \
   --topics topics-and-qrels/trecfair2022.train.queries.tsv \
   --qrel topics-and-qrels/trecfair2022.train.qrels_w_random_negative_samples.txt \
-  --output_t5_texts t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.bm25.qrels_w_random_negative_samples.txt \
-  --output_t5_ids t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.bm25.qrels_w_random_negative_samples.ids.txt \
+  --output_t5_texts t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.qrels_w_random_negative_samples.txt \
+  --output_t5_ids t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.qrels_w_random_negative_samples.ids.txt \
   --stride 4 \
   --max_length 8
 ```

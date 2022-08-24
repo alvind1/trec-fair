@@ -3,10 +3,12 @@ import pandas as pd
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--files', type=str, nargs='+')
-parser.add_argument('--output-file', dest='outputFile', type=str, required=True)
+parser.add_argument('--output-file', type=str, required=False)
 parser.add_argument('--task', type=int, choices=[1, 2], required=True)
-
 args = parser.parse_args()
+
+if args.files == None:
+  raise Exception('--files argument must be provided')
 
 results = []
 for filename in args.files:
@@ -34,9 +36,10 @@ for filename in args.files:
     print()
     results.append([filename, meanEEL, meanEER, meanEED])
 
-if args.task == 1:
-  results = pd.DataFrame(results, columns=['run', 'Mean nDCG', 'Mean AWRF', 'Mean Score'])
-elif args.task == 2:
-  results = pd.DataFrame(results, columns=['run', 'Mean EE-L', 'Mean EE-R', 'Mean EE-D'])
+if args.output_file != None:
+  if args.task == 1:
+    results = pd.DataFrame(results, columns=['run', 'Mean nDCG', 'Mean AWRF', 'Mean Score'])
+  elif args.task == 2:
+    results = pd.DataFrame(results, columns=['run', 'Mean EE-L', 'Mean EE-R', 'Mean EE-D'])
 
-results.to_csv(args.outputFile, sep='\t', float_format='%.3f')
+  results.to_csv(args.output_file, sep='\t', float_format='%.3f')

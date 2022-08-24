@@ -71,7 +71,6 @@ if __name__ == '__main__':
     parser.add_argument('--stride', type=int, default=5, help='')
     parser.add_argument('--max_length', type=int, default=10, help='')
     parser.add_argument('--only-first-segment', action='store_true')
-
     args = parser.parse_args()
 
     if args.run == '' and args.qrel == '':
@@ -161,8 +160,8 @@ if __name__ == '__main__':
                     if args.only_first_segment:
                         break
 
-    print(f'{n_no_content} examples with only title')
-    print(f'{n_not_found} examples not found')
-    print(f'Wrote {n_segments} segments from {n_docs} docs.')
-    print(f'There were {n_no_segments} docs without segments/sentences.')
-    print('Done')
+    logging.info(f'{n_no_content} examples with only title')
+    logging.info(f'{n_not_found} examples not found')
+    logging.info(f'Wrote {n_segments} segments from {n_docs} docs.')
+    logging.info(f'There were {n_no_segments} docs without segments/sentences.')
+    logging.info('Done')

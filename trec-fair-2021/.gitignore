@@ -7,3 +7,4 @@ runs/*
 t5_inputs/*
 topics-and-qrels/*
 temp*
+__pycache__
