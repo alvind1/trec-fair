@@ -7,7 +7,7 @@ Types
 
 ## Output
 The files generated should take the format  
-`{year}.{dataset}.{qrels_<negative sampling specification>}.txt`
+`{year}.{dataset}.{qrels<negative sampling specification>}.txt`
 
 `year`
 - trecfair2021
@@ -30,6 +30,7 @@ python convert_trec_fair_2022_reldocs_to_qrels.py \
   --input topics-and-qrels/raw/trecfair2022.train.topics_meta.jsonl \
   --output topics-and-qrels/trecfair2022.train.qrels.txt
 ```
+There should be 1,974,943 qrels generated.
 
 Train qrels with random negative sampling
 ```bash
@@ -39,6 +40,7 @@ python convert_trec_fair_2022_reldocs_to_qrels.py \
   --docIDs topics-and-qrels/trecfair2022.docids.txt \
   --output topics-and-qrels/trecfair2022.train.qrels_w_random_negative_samples.txt
 ```
+There should be 3,949,886 qrels generated.
 
 Train qrels with run negative sampling
 ```bash
@@ -49,6 +51,7 @@ python convert_trec_fair_2022_reldocs_to_qrels.py \
   --run runs/trecfair2022.train.run100000.plain_corpus_ignore_duplicates.bm25.txt \
   --output topics-and-qrels/trecfair2022.train.qrels_w_run_negative_samples.txt
 ```
+There should be 3,458,088 qrels generated.
 
 Check that each train qrel generation is valid with
 ```bash

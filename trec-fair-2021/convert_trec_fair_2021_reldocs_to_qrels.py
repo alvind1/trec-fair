@@ -18,9 +18,6 @@ def negsamp_vectorized_bsearch(pos_inds, n_items, n_samp):
     neg_inds = raw_samp + ss
     return set(neg_inds)
 
-def sample_from_run(positives, run):
-    idx = np.searchsorted(positives, len(run))
-
 def load_runs(path):
     runs = {}
     prev_query_id = -1
@@ -58,7 +55,7 @@ def get_pos_inds_from_run(run_docs, rel_docs):
     return a_temp[a_temp != b_temp]
 
 parser = argparse.ArgumentParser(description='Converts trec fair 2021 reldocs to qrels')
-parser.add_argument('--input', type=str, required=True, help='input file containing the rel docs of trec fair 2022 documents')
+parser.add_argument('--input', type=str, required=True, help='input file containing the rel docs of trec fair 2021 documents')
 parser.add_argument('--output', type=str, required=True, help='output file containg the rel docs in qrels format')
 parser.add_argument('--run', type=str, default="", required=False, help='path to BM25 run file from which to sample negative examples')
 parser.add_argument('--docIDs', type=str, default="", required=False, help='path to docIDs file, used to generate negative examples')

@@ -22,7 +22,7 @@ The files generated should take the format
 `run type/qrels_<negative sampling specification>`
 - qrels_w_random_negative_samples if we are generating input for training
 - qrels_w_run_negative_samples if we are generating input for training
-- `bm25` otherwise
+- bm25 otherwise
 
 ## Train Data
 
