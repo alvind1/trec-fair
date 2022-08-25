@@ -56,8 +56,8 @@ python create_trec_fair_2021_monot5_input.py \
   --corpus collections/text/trecfair2021.text.jsonl \
   --topics topics-and-qrels/trecfair2021.eval.queries.tsv \
   --qrel topics-and-qrels/trecfair2021.eval.qrels.txt \
-  --output_t5_texts t5_inputs/trecfair2021.eval.t5input.text_corpus.bm25.qrels.txt \
-  --output_t5_ids t5_inputs/trecfair2021.eval.t5input.text_corpus.bm25.qrels.ids.txt \
+  --output_t5_texts t5_inputs/trecfair2021.eval.t5input.text_corpus.qrels.txt \
+  --output_t5_ids t5_inputs/trecfair2021.eval.t5input.text_corpus.qrels.ids.txt \
   --stride 4 \
   --max_length 8
 ```
@@ -68,8 +68,8 @@ python create_trec_fair_2021_monot5_input.py \
   --corpus collections/text/trecfair2021.text.jsonl \
   --topics topics-and-qrels/trecfair2021.eval.queries.tsv \
   --qrel topics-and-qrels/trecfair2021.eval.qrels_w_random_negative_samples.txt \
-  --output_t5_texts t5_inputs/trecfair2021.eval.t5input.text_corpus.bm25.qrels_w_random_negative_samples.txt \
-  --output_t5_ids t5_inputs/trecfair2021.eval.t5input.text_corpus.bm25.qrels_w_random_negative_samples.ids.txt \
+  --output_t5_texts t5_inputs/trecfair2021.eval.t5input.text_corpus.qrels_w_random_negative_samples.txt \
+  --output_t5_ids t5_inputs/trecfair2021.eval.t5input.text_corpus.qrels_w_random_negative_samples.ids.txt \
   --stride 4 \
   --max_length 8
 ```

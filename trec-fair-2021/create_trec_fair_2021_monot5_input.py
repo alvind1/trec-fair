@@ -1,25 +1,33 @@
 import argparse
+import json
 import logging
 import re
 import spacy
-import json
-
 from tqdm import tqdm
 
+import config
 
 def load_corpus(path):
+    logging.info('loading corpus...')
     corpus = {}
-    with open(path, 'r') as fcorpus:
-        for line in tqdm(fcorpus):
+    with open(path, 'r') as f_corpus:
+        for line in tqdm(f_corpus, total=config.NUM_DOCUMENTS):
             line = json.loads(line)
-            corpus[int(line['id'])] = line
+            #corpus[int(line['id'])] = line
+            corpus[int(line['id'])] = {'contents': line['contents'], 'title': line['raw']['title']}
     return corpus
 
 
 def load_queries(path):
+    logging.info('loading queries...')
     queries = {}
-    with open(path, 'r') as fqueries:
-        for line in tqdm(fqueries):
+    total = None
+    if DATA_MODE == 'TRAIN':
+        total = config.NUM_TRAIN_QUERIES
+    elif DATA_MODE == 'EVAL':
+        total = config.NUM_EVAL_QUERIES
+    with open(path, 'r') as f_queries:
+        for line in tqdm(f_queries, total=total):
             line = line.rstrip().split('\t')
             query_id = int(line[0])
             query, keywords = line[1].split(maxsplit=1)
@@ -27,10 +35,11 @@ def load_queries(path):
     return queries
 
 
-def load_run(path):
+def load_runs(path):
+    logging.info('loading runs...')
     run = {}
-    with open(path, 'r') as frun:
-        for line in tqdm(frun):
+    with open(path, 'r') as f_runs:
+        for line in tqdm(f_runs):
             query_id, _, doc_id, _, _, _ = line.split()
             query_id = int(query_id)
             doc_id = int(doc_id.rstrip('\n'))
@@ -40,9 +49,10 @@ def load_run(path):
     return run
 
 def load_qrels(path):
+    logging.info('loading qrels...')
     run = {}
-    with open(path, 'r') as frun:
-        for line in tqdm(frun):
+    with open(path, 'r') as f_qrels:
+        for line in tqdm(f_qrels):
             query_id, _, doc_id, rel = line.split()
             query_id = int(query_id)
             doc_id = int(doc_id)
@@ -71,21 +81,45 @@ if __name__ == '__main__':
     parser.add_argument('--stride', type=int, default=5, help='')
     parser.add_argument('--max_length', type=int, default=10, help='')
     parser.add_argument('--only-first-segment', action='store_true')
+    parser.add_argument('--ignore-naming', action='store_true')
+    parser.add_argument('--verbose', action='store_true')
     args = parser.parse_args()
 
     if args.run == '' and args.qrel == '':
         parser.error("at least one of --run, --qrel is required")
         quit()
 
-    logging.info(args)
+    if args.verbose:
+        logging.basicConfig(level=logging.DEBUG)
+    else:
+        logging.basicConfig(level=logging.INFO)
+    logging.info("starting t5 input generation")
+
+    DATA_MODE = ""
+    if not args.ignore_naming:
+        if re.search('train', args.topics, re.IGNORECASE):
+            DATA_MODE = 'TRAIN'
+            logging.info('Assuming train data mode')
+        elif re.search('eval', args.topics):
+            DATA_MODE = 'EVAL'
+            logging.info('Assuming eval data mode')
+        else:
+            raise Exception('file naming error: expected topics type to be specified by having "train" or "eval" in file name')
+
+        if args.qrel != '':
+            assert re.search(DATA_MODE, args.qrel, re.IGNORECASE) != None
+        else:
+            assert re.search(DATA_MODE, args.run, re.IGNORECASE) != None
+        assert re.search(DATA_MODE, args.output_t5_texts, re.IGNORECASE) != None
+        assert re.search(DATA_MODE, args.output_t5_ids, re.IGNORECASE) != None
 
     queries = load_queries(args.topics)
     run = {}
     if args.run != '':
-        run = load_run(args.run)
+        runs = load_runs(args.run)
     elif args.qrel != '':
-        run = load_qrels(args.qrel)
-    assert len(run) > 0
+        runs = load_qrels(args.qrel)
+    assert len(runs) > 0
     corpus = load_corpus(args.corpus)
 
     nlp = spacy.blank("en")
@@ -98,7 +132,7 @@ if __name__ == '__main__':
     set_ids = set()
     with open(args.output_t5_texts, 'w') as fout_t5_texts,  \
             open(args.output_t5_ids, 'w') as fout_t5_ids:
-        for (query_id, docs) in tqdm(run.items()):
+        for (query_id, docs) in tqdm(runs.items()):
             query, keywords = queries[query_id]
             for doc_id, rel in docs:
                 if doc_id not in corpus:
@@ -107,8 +141,10 @@ if __name__ == '__main__':
                     continue
                 contents = corpus[doc_id]
                 n_docs += 1
+                #passage_text = contents['contents']
+                #doc_title = contents['raw']['title']
                 passage_text = contents['contents']
-                doc_title = contents['raw']['title']
+                doc_title = contents['title']
 
                 # Remove any duplicated spaces or line breaks.
                 passage_text = ' '.join(passage_text.split())
@@ -136,24 +172,19 @@ if __name__ == '__main__':
 
                     fout_t5_ids.write(f'{query_id}\t{doc_id}\t{i}\n')
 
-                    if keywords == "":
+                    if args.qrel != '':
                         relevant = ''
                         if rel == 1:
                             relevant = '\ttrue'
                         elif rel == 0:
                             relevant = '\tfalse'
-                        assert args.qrel != '' and relevant != ''
-                        fout_t5_texts.write(
-                            f'Query: {query} Document: {segment} Relevant:{relevant}\n')
-                    else:
-                        relevant = ''
-                        if rel == 1:
-                            relevant = '\ttrue'
-                        elif rel == 0:
-                            relevant = '\tfalse'
-                        assert args.qrel != '' and relevant != ''
-                        fout_t5_texts.write(
-                            f'Query: {query} Keywords: {keywords} Document: {segment} Relevant:{relevant}\n')
+                        assert relevant != ''
+                        if keywords == "":
+                            fout_t5_texts.write(
+                                f'Query: {query} Document: {segment} Relevant:{relevant}\n')
+                        else:
+                            fout_t5_texts.write(
+                                f'Query: {query} Keywords: {keywords} Document: {segment} Relevant:{relevant}\n')
                     n_segments += 1
                     if i + args.max_length >= len(sentences):
                         break
