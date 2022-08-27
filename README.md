@@ -71,3 +71,67 @@ python create_trec_fair_monot5_input.py \
   --stride 4 \
   --max_length 8
 ```
+
+## Selecting only true/false examples
+
+2021 Ex.
+```bash
+python select_truefalse_examples_trec_fair_t5.py \
+  --t5-input trec-fair-2021/t5_inputs/trecfair2021.train.t5input.text_corpus.bm25.qrels_w_random_negative_samples.txt \
+  --t5-ids-input trec-fair-2021/t5_inputs/trecfair2021.train.t5input.text_corpus.bm25.qrels_w_random_negative_samples.ids.txt \
+  --output trec-fair-2021/t5_inputs/trecfair2021.train.t5input.text_corpus.qrels_only_negatives.txt \
+  --output-ids trec-fair-2021/t5_inputs/trecfair2021.train.t5input.text_corpus.qrels_only_negatives.ids.txt \
+  --relevance false
+
+python select_truefalse_examples_trec_fair_t5.py \
+  --t5-input trec-fair-2021/t5_inputs/trecfair2021.eval.t5input.text_corpus.qrels_w_random_negative_samples.txt \
+  --t5-ids-input trec-fair-2021/t5_inputs/trecfair2021.eval.t5input.text_corpus.qrels_w_random_negative_samples.ids.txt \
+  --output trec-fair-2021/t5_inputs/trecfair2021.eval.t5input.text_corpus.qrels_only_negatives.txt \
+  --output-ids trec-fair-2021/t5_inputs/trecfair2021.eval.t5input.text_corpus.qrels_only_negatives.ids.txt \
+  --relevance false
+```
+
+2022 Ex.
+```bash
+python select_truefalse_examples_trec_fair_t5.py \
+  --t5-input trec-fair-2022/t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.qrels_w_random_negative_samples.txt \
+  --t5-ids-input trec-fair-2022/t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.qrels_w_random_negative_samples.ids.txt \
+  --output trec-fair-2022/t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.qrels_only_negatives.txt \
+  --output-ids trec-fair-2022/t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.qrels_only_negatives.ids.txt \
+  --relevance false
+```
+
+## Selecting best segments for training
+
+2021 Ex.
+```bash
+python select_best_segment_trec_fair_t5.py \
+  --t5-predictions <fairness predictions> \
+  --t5-input trec-fair-2021/t5_inputs/trecfair2021.train.t5input.text_corpus.bm25.qrels_no_negatives.txt \
+  --t5-ids-input trec-fair-2021/t5_inputs/trecfair2021.train.t5input.text_corpus.bm25.qrels_no_negatives.ids.txt \
+  --negative-segments trec-fair-2021/t5_inputs/trecfair2021.train.t5input.text_corpus.qrels_only_negatives.txt \
+  --negative-ids trec-fair-2021/t5_inputs/trecfair2021.train.t5input.text_corpus.qrels_only_negatives.ids.txt \
+  --t5-output trec-fair-2021/t5_inputs/trecfair2021.train.t5input.text_corpus.best_segments_w_random_negatives.txt \
+  --t5-ids-output trec-fair-2021/t5_inputs/trecfair2021.train.t5input.text_corpus.best_segments_w_random_negatives.ids.txt
+
+python select_best_segment_trec_fair_t5.py \
+  --t5-predictions <fairness predictions> \
+  --t5-input trec-fair-2021/t5_inputs/trecfair2021.eval.t5input.text_corpus.qrels_no_negatives.txt \
+  --t5-ids-input trec-fair-2021/t5_inputs/trecfair2021.eval.t5input.text_corpus.qrels_no_negatives.ids.txt \
+  --negative-segments trec-fair-2021/t5_inputs/trecfair2021.eval.t5input.text_corpus.qrels_only_negatives.txt \
+  --negative-ids trec-fair-2021/t5_inputs/trecfair2021.eval.t5input.text_corpus.qrels_only_negatives.ids.txt \
+  --t5-output trec-fair-2021/t5_inputs/trecfair2021.eval.t5input.text_corpus.best_segments_w_random_negatives.txt \
+  --t5-ids-output trec-fair-2021/t5_inputs/trecfair2021.eval.t5input.text_corpus.best_segments_w_random_negatives.ids.txt
+```
+
+2022 Ex.
+```bash
+python select_best_segment_trec_fair_t5.py \
+  --t5-predictions <fairness predictions> \
+  --t5-input trec-fair-2022/t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.qrels_no_negatives.txt \
+  --t5-ids-input trec-fair-2022/t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.qrels_no_negatives.ids.txt \
+  --negative-segments trec-fair-2022/t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.qrels_only_negatives.txt \
+  --negative-ids trec-fair-2022/t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.qrels_only_negatives.ids.txt \
+  --t5-output trec-fair-2022/t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.best_segments_w_random_negatives.txt \
+  --t5-ids-output trec-fair-2022/t5_inputs/trecfair2022.train.t5input.plain_corpus_ignore_duplicates.best_segments_w_random_negatives.ids.txt
+```
