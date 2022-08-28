@@ -8,6 +8,7 @@ from tqdm import tqdm
 import config
 import utils
 
+
 def load_corpus(path):
     logging.info('loading corpus...')
     corpus = {}
@@ -16,9 +17,11 @@ def load_corpus(path):
         for line in tqdm(f_corpus, total=total):
             line = json.loads(line)
             if YEAR == '2021':
-                corpus[int(line['id'])] = {'contents': line['contents'], 'title': line['raw']['title']}
+                corpus[int(line['id'])] = {
+                    'contents': line['contents'], 'title': line['raw']['title']}
             elif YEAR == '2022':
-                corpus[int(line['id'])] = {'contents': line['contents'], 'title': line['title']}
+                corpus[int(line['id'])] = {
+                    'contents': line['contents'], 'title': line['title']}
             else:
                 raise ValueError('YEAR must be "2021" or "2022"')
     return corpus
@@ -49,6 +52,7 @@ def load_runs(path):
                 run[query_id] = []
             run[query_id].append((doc_id, -1))
     return run
+
 
 def load_qrels(path):
     logging.info('loading qrels...')
@@ -99,16 +103,8 @@ if __name__ == '__main__':
     DATA_MODE = utils.get_data_mode_from_file_name(args.topics)
     YEAR = utils.get_year_from_file_name(args.topics)
 
-    if args.qrel != '':
-        assert re.search(DATA_MODE, args.qrel, re.IGNORECASE) != None
-        assert re.search(YEAR, args.qrel, re.IGNORECASE) != None
-    else:
-        assert re.search(DATA_MODE, args.run, re.IGNORECASE) != None
-        assert re.search(YEAR, args.run, re.IGNORECASE) != None
-    assert re.search(DATA_MODE, args.output_t5_texts, re.IGNORECASE) != None
-    assert re.search(YEAR, args.output_t5_texts, re.IGNORECASE) != None
-    assert re.search(DATA_MODE, args.output_t5_ids, re.IGNORECASE) != None
-    assert re.search(YEAR, args.output_t5_ids, re.IGNORECASE) != None
+    utils.assert_file_naming(
+        YEAR, DATA_MODE, args.output_t5_texts, args.output_t5_ids, args.qrel, args.run)
 
     queries = load_queries(args.topics)
     run = {}
@@ -159,7 +155,8 @@ if __name__ == '__main__':
                             doc_title = doc_title[1:]
 
                         if i == 0:
-                            segment = '. '.join([doc_title, segment[len(doc_title):]])
+                            segment = '. '.join(
+                                [doc_title, segment[len(doc_title):]])
                         else:
                             segment = '. '.join([doc_title, segment])
 
@@ -190,5 +187,6 @@ if __name__ == '__main__':
     logging.info(f'{n_no_content} examples with only title')
     logging.info(f'{n_not_found} examples not found')
     logging.info(f'Wrote {n_segments} segments from {n_docs} docs.')
-    logging.info(f'There were {n_no_segments} docs without segments/sentences.')
+    logging.info(
+        f'There were {n_no_segments} docs without segments/sentences.')
     logging.info('Done')

@@ -2,19 +2,45 @@
 
 This repo holds scripts used to process data for TREC Fair 2021, 2022.
 
+# Prepare topics
+
+2021 Ex.
+```bash
+python convert_trec_fair_queries_to_tsv.py \
+  --input trec-fair-2021/topics-and-qrels/raw/trecfair2021.train.topics.json \
+  --output trec-fair-2021/topics-and-qrels/trecfair2021.train.queries.tsv
+
+python convert_trec_fair_queries_to_tsv.py \
+  --input trec-fair-2021/topics-and-qrels/raw/trecfair2021.eval.topics.json \
+  --output trec-fair-2021/topics-and-qrels/trecfair2021.eval.queries.tsv
+```
+
+2022 Ex.
+```bash
+python convert_trec_fair_queries_to_tsv.py \
+  --input trec-fair-2022/topics-and-qrels/raw/trecfair2022.train.topics_meta.jsonl \
+  --output trec-fair-2022/topics-and-qrels/trecfair2022.train.queries.tsv
+
+python convert_trec_fair_queries_to_tsv.py \
+  --input trec-fair-2022/topics-and-qrels/raw/trecfair2022.eval.topics.jsonl \
+  --output trec-fair-2022/topics-and-qrels/trecfair2022.eval.queries.tsv \
+  --eval
+```
+
 # Get Doc IDs
+
 2021 Ex.
 ```bash
 python get_trec_fair_doc_ids.py \
   --input trec-fair-2021/collections/text/trecfair2021.text.jsonl \
-  --output trec-fair-2021/topics-and-qrels/trecfair2021.docids2.txt
+  --output trec-fair-2021/topics-and-qrels/trecfair2021.docids.txt
 ```
 
 2022 Ex.
 ```bash
 python get_trec_fair_doc_ids.py \
   --input trec-fair-2022/collections/plain/trecfair2022.plain.jsonl \
-  --output trec-fair-2022/topics-and-qrels/trecfair2022.docids.txt
+  --output trec-fair-2022/topics-and-qrels/trecfair2022.docids2.txt
 ```
 
 # Prepare qrels

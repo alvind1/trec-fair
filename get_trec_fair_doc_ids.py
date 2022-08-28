@@ -16,6 +16,7 @@ logging.info('getting doc ids...')
 
 YEAR = utils.get_year_from_file_name(args.input)
 total = utils.get_num_documents(YEAR, unique=(YEAR == '2022'))
+utils.assert_file_naming(YEAR, None, args.output)
 
 with open(args.input, 'r') as f, open(args.output, 'w') as outf:
     docIDs = set()

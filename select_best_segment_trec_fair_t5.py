@@ -21,6 +21,7 @@ parser.add_argument('--t5-output', required=True, help='output file')
 parser.add_argument('--t5-ids-output', required=True, help='output file')
 args = parser.parse_args()
 
+
 def load_t5_segments(t5_segment_path, t5_ids_path, t5_predictions_path):
     t5_segments = {}
     with open(t5_segment_path, 'r') as f_t5_segments, open(t5_ids_path, 'r')as f_t5_ids, open(t5_predictions_path, 'r') as f_t5_predictions:
@@ -33,8 +34,10 @@ def load_t5_segments(t5_segment_path, t5_ids_path, t5_predictions_path):
                 t5_segments[query_id] = {}
             if doc_id not in t5_segments[query_id]:
                 t5_segments[query_id][doc_id] = []
-            t5_segments[query_id][doc_id].append((score, segment_line, ids_line))
+            t5_segments[query_id][doc_id].append(
+                (score, segment_line, ids_line))
     return t5_segments
+
 
 def load_negative_segments(negative_segments_path, negative_ids_path):
     negative_segments = {}
@@ -47,8 +50,11 @@ def load_negative_segments(negative_segments_path, negative_ids_path):
             negative_segments[query_id].append((segment_line, line))
     return negative_segments
 
-t5_segments = load_t5_segments(args.t5_input, args.t5_ids_input, args.t5_predictions)
-negative_segments = load_negative_segments(args.negative_segments, args.negative_ids)
+
+t5_segments = load_t5_segments(
+    args.t5_input, args.t5_ids_input, args.t5_predictions)
+negative_segments = load_negative_segments(
+    args.negative_segments, args.negative_ids)
 
 with open(args.t5_output, 'w') as f_t5_output, open(args.t5_ids_output, 'w') as f_t5_ids_output:
     for query_id, doc_ids in tqdm(t5_segments.items()):

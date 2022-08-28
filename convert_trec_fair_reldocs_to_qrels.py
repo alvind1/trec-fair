@@ -6,6 +6,7 @@ import re
 from tqdm import tqdm
 
 import config
+import utils
 
 # modified from https://tech.hbc.com/2018-03-23-negative-sampling-in-numpy.html
 
@@ -137,12 +138,7 @@ else:
     logging.info('creating qrels...')
 if YEAR == '2021':
     with open(args.input, 'r') as f, open(args.output, 'w') as outf:
-        if DATA_MODE == 'TRAIN':
-            total = config.TRECFAIR2021_NUM_TRAIN_QUERIES
-        elif DATA_MODE == 'EVAL':
-            total = config.TRECFAIR2021_NUM_EVAL_QUERIES
-        else:
-            total = None
+        total = utils.get_num_queries(YEAR, DATA_MODE)
         for line in tqdm(f, total=total):
             query = json.loads(line)
             rel_docs = set()
