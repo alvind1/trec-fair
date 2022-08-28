@@ -2,6 +2,21 @@
 
 This repo holds scripts used to process data for TREC Fair 2021, 2022.
 
+# Get Doc IDs
+2021 Ex.
+```bash
+python get_trec_fair_doc_ids.py \
+  --input trec-fair-2021/collections/text/trecfair2021.text.jsonl \
+  --output trec-fair-2021/topics-and-qrels/trecfair2021.docids2.txt
+```
+
+2022 Ex.
+```bash
+python get_trec_fair_doc_ids.py \
+  --input trec-fair-2022/collections/plain/trecfair2022.plain.jsonl \
+  --output trec-fair-2022/topics-and-qrels/trecfair2022.docids.txt
+```
+
 # Prepare qrels
 
 Convert train reldocs to qrels of the form `query_id 0 doc_id relevant`
