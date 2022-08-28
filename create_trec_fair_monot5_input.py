@@ -6,6 +6,7 @@ import spacy
 from tqdm import tqdm
 
 import config
+import utils
 
 def load_corpus(path):
     logging.info('loading corpus...')
@@ -26,7 +27,7 @@ def load_corpus(path):
 def load_queries(path):
     logging.info('loading queries...')
     queries = {}
-    total = config.get_queries(YEAR, DATA_MODE)
+    total = utils.get_num_queries(YEAR, DATA_MODE)
     with open(path, 'r') as f_queries:
         for line in tqdm(f_queries, total=total):
             line = line.rstrip().split('\t')
@@ -95,27 +96,8 @@ if __name__ == '__main__':
     else:
         logging.basicConfig(level=logging.INFO)
 
-    DATA_MODE = ''
-    if re.search('train', args.topics, re.IGNORECASE):
-        DATA_MODE = 'TRAIN'
-        logging.info('Assuming train data mode')
-    elif re.search('eval', args.topics):
-        DATA_MODE = 'EVAL'
-        logging.info('Assuming eval data mode')
-    else:
-        raise Exception('file naming error: expected topics type to be specified by having "train" or "eval" in file name')
-
-    YEAR = ''
-    if re.search('2021', args.topics):
-        YEAR = '2021'
-        logging.info('Assuming 2021')
-    elif re.search('2022', args.topics):
-        YEAR = '2022'
-        logging.info('Assuming 2022')
-    else:
-        raise Exception(
-            'file naming error: could not deduce year as either "2021" or "2022" from topics file name')
-
+    DATA_MODE = utils.get_data_mode_from_file_name(args.topics)
+    YEAR = utils.get_year_from_file_name(args.topics)
 
     if args.qrel != '':
         assert re.search(DATA_MODE, args.qrel, re.IGNORECASE) != None
