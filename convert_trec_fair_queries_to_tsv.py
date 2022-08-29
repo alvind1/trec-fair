@@ -21,6 +21,7 @@ logging.info('converting topics...')
 
 YEAR = utils.get_year_from_file_name(args.input)
 DATA_MODE = utils.get_data_mode_from_file_name(args.input)
+utils.assert_file_naming(YEAR, DATA_MODE, args.input, args.output)
 
 if YEAR == '2021':
     with open(args.input, 'r') as f, open(args.output, 'w') as outf:

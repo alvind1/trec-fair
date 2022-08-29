@@ -12,7 +12,7 @@ import utils
 def load_corpus(path):
     logging.info('loading corpus...')
     corpus = {}
-    total = config.get_documents(YEAR)
+    total = utils.get_num_documents(YEAR)
     with open(path, 'r') as f_corpus:
         for line in tqdm(f_corpus, total=total):
             line = json.loads(line)

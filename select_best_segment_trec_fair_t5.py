@@ -1,28 +1,16 @@
 import argparse
 import collections
+import json
+import logging
 import math
 import numpy as np
 import re
-import json
 from tqdm import tqdm
 
-parser = argparse.ArgumentParser(
-    description='Convert T5 predictions into TREC runs.')
-parser.add_argument('--t5-predictions', required=True,
-                    help='T5 predictions file')
-parser.add_argument('--t5-input', required=True,
-                    help='T5 segment input file')
-parser.add_argument('--t5-ids-input', required=True,
-                    help='File containing query doc id pairs paired with the '
-                         'T5\'s predictions file.')
-parser.add_argument('--negative-segments', required=True)
-parser.add_argument('--negative-ids', required=True)
-parser.add_argument('--t5-output', required=True, help='output file')
-parser.add_argument('--t5-ids-output', required=True, help='output file')
-args = parser.parse_args()
-
+import utils
 
 def load_t5_segments(t5_segment_path, t5_ids_path, t5_predictions_path):
+    logging.info('loading t5 segments...')
     t5_segments = {}
     with open(t5_segment_path, 'r') as f_t5_segments, open(t5_ids_path, 'r')as f_t5_ids, open(t5_predictions_path, 'r') as f_t5_predictions:
         for segment_line in tqdm(f_t5_segments):
@@ -40,6 +28,7 @@ def load_t5_segments(t5_segment_path, t5_ids_path, t5_predictions_path):
 
 
 def load_negative_segments(negative_segments_path, negative_ids_path):
+    logging.info('loading negative segments...')
     negative_segments = {}
     with open(negative_segments_path, 'r') as f_segments, open(negative_ids_path, 'r') as f_ids:
         for segment_line in tqdm(f_segments):
@@ -50,6 +39,26 @@ def load_negative_segments(negative_segments_path, negative_ids_path):
             negative_segments[query_id].append((segment_line, line))
     return negative_segments
 
+parser = argparse.ArgumentParser(
+    description='Convert T5 predictions into TREC runs.')
+parser.add_argument('--t5-predictions', required=True,
+                    help='T5 predictions file')
+parser.add_argument('--t5-input', required=True,
+                    help='T5 segment input file')
+parser.add_argument('--t5-ids-input', required=True,
+                    help='File containing query doc id pairs paired with the '
+                         'T5\'s predictions file.')
+parser.add_argument('--negative-segments', required=True)
+parser.add_argument('--negative-ids', required=True)
+parser.add_argument('--t5-output', required=True, help='output file')
+parser.add_argument('--t5-ids-output', required=True, help='output file')
+args = parser.parse_args()
+
+logging.basicConfig(level=logging.INFO)
+
+YEAR = utils.get_year_from_file_name(args.t5_input)
+DATA_MODE = utils.get_data_mode_from_file_name(args.t5_input)
+utils.assert_file_naming(YEAR, DATA_MODE, args.t5_input, args.t5_ids_input, args.negative_segments, args.negative_ids, args.t5_output, args.t5_ids_output, args.t5_predictions)
 
 t5_segments = load_t5_segments(
     args.t5_input, args.t5_ids_input, args.t5_predictions)

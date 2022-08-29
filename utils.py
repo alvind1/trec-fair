@@ -60,11 +60,19 @@ def get_num_queries(year, data_type):
         raise ValueError('Expected "TRAIN" or "EVAL" for data type')
 
 
-def assert_file_naming(year=False, data_mode=False, *file_names):
+def assert_file_naming(year, data_mode, *file_names):
     for file_name in file_names:
-        if file_name == None:
+        if not file_name:
             continue
         if year:
-            assert re.search(year, file_name, re.IGNORECASE) != None
+            try:
+                assert re.search(year, file_name, re.IGNORECASE) != None
+            except AssertionError as assert_err:
+                logging.error(f'Could not find {year} in {file_name}: file naming error')
+                raise assert_err
         if data_mode:
-            assert re.search(data_mode, file_name, re.IGNORECASE) != None
+            try:
+                assert re.search(data_mode, file_name, re.IGNORECASE) != None
+            except AssertionError as assert_err:
+                logging.error(f'Could not find {data_mode} in {file_name}: file naming error')
+                raise assert_err

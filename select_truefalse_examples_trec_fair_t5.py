@@ -24,4 +24,4 @@ with open(args.t5_input, 'r') as f_t5, open(args.t5_ids_input, 'r') as f_t5_ids,
             f_out.write(line)
             f_out_ids.write(id_line)
             count += 1
-logging.info(f'wrote {count} segments to {args.output}')
+    logging.info(f'wrote {count} segments to {args.output}')

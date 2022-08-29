@@ -91,33 +91,9 @@ if args.verbose:
 else:
     logging.basicConfig(level=logging.INFO)
 
-DATA_MODE = ''
-if re.search('train', args.input, re.IGNORECASE):
-    DATA_MODE = 'TRAIN'
-    logging.info('Assuming TRAIN data mode')
-elif re.search('eval', args.input, re.IGNORECASE):
-    DATA_MODE = 'EVAL'
-    logging.info('Assuming EVAL data mode')
-else:
-    raise Exception(
-        'file naming error: could not deduce data mode as either "train" or "eval" from input file name')
-
-YEAR = ''
-if re.search('2021', args.input):
-    YEAR = '2021'
-    logging.info('Assuming 2021')
-elif re.search('2022', args.input):
-    YEAR = '2022'
-    logging.info('Assuming 2022')
-else:
-    raise Exception(
-        'file naming error: could not deduce year as either "2021" or "2022" from input file name')
-
-if args.run:
-    assert re.search(DATA_MODE, args.run, re.IGNORECASE) != None
-    assert re.search(YEAR, args.run) != None
-assert re.search(DATA_MODE, args.output, re.IGNORECASE) != None
-assert re.search(YEAR, args.output) != None
+DATA_MODE = utils.get_data_mode_from_file_name(args.input)
+YEAR = utils.get_year_from_file_name(args.input)
+utils.assert_file_naming(YEAR, DATA_MODE, args.input, args.output, args.run)
 
 run = []
 doc_ids = []
@@ -133,7 +109,7 @@ elif args.run_negative_samples:
     runs = load_runs(args.run)
     assert args.docIDs != ""
     doc_ids = load_doc_ids(args.docIDs)
-    logging.info('creating qrles with random negative samples...')
+    logging.info('creating qrels with run negative samples...')
 else:
     logging.info('creating qrels...')
 if YEAR == '2021':

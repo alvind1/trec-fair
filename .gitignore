@@ -1,1 +1,7 @@
 __pycache__
+temp*
+topics-and-qrels/
+collections/
+t5_inputs/
+t5_predictions/
+runs/
